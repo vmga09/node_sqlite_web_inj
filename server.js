@@ -1,9 +1,12 @@
 // Create express app
 const express = require("express")
 const app = express()
+//Conexion base de datos sqlite
 const db = require("./db/database")
+//Encrip y jwt
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -23,7 +26,7 @@ app.get("/", (req, res, next) => {
 
 // Insert here other API endpoints
 
-// Api endpoints
+//List all user 
 app.get("/api/users", (req, res, next) => {
     const sql = "select * from user"
     const params = []
@@ -40,9 +43,26 @@ app.get("/api/users", (req, res, next) => {
 });
 
 
+//List all coffe
+app.get("/api/coffe", (req, res, next) => {
+    const sql = "select * from coffees"
+    const params = []
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+          res.status(400).json({"error":err.message});
+          return;
+        }
+        res.json({
+            "message":"success",
+            "data":rows
+        })
+      });
+});
 
 
 
+
+//Obtener un usuario 
 app.get("/api/user/:id", (req, res, next) => {
     const sql = "select * from user where id = ?"
     const params = [req.params.id]
@@ -58,7 +78,7 @@ app.get("/api/user/:id", (req, res, next) => {
       });
 });
 
-
+//Crear usuario 
 app.post("/api/user/", async (req, res, next) => {
     const errors=[]
     if (!req.body.password){
@@ -93,6 +113,9 @@ app.post("/api/user/", async (req, res, next) => {
     });
 });
 
+
+
+// Update user
 app.patch("/api/user/:id", async (req, res, next) => {
     const  data = {
         name: req.body.name,
@@ -119,7 +142,7 @@ app.patch("/api/user/:id", async (req, res, next) => {
     });
 });
 
-
+// Delete user from db
 app.delete("/api/user/:id", (req, res, next) => {
     db.run(
         'DELETE FROM user WHERE id = ?',
@@ -134,6 +157,9 @@ app.delete("/api/user/:id", (req, res, next) => {
 })
 
 
+
+
+// Function login user 
 app.post("/api/login", async (req, res, next) => {
     const jwtTiempoEx = '7d'
     const jwtSecreto = "S3cr3t0"
@@ -174,11 +200,6 @@ app.post("/api/login", async (req, res, next) => {
             } else { 
                 const newId = row.id
                 const token = jwt.sign({id:newId},jwtSecreto,{expiresIn:jwtTiempoEx})
-
-
-                
-
-
                 res.status(200).json({
                     "message":"usuario logueado",
                     token
