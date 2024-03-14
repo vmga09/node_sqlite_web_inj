@@ -157,6 +157,48 @@ app.delete("/api/user/:id", (req, res, next) => {
 })
 
 
+//List all countries
+app.get("/api/countries", (req, res, next) => {
+    const sql = "select * from countries"
+    const params = []
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+          res.status(400).json({"error":err.message});
+          return;
+        }
+        res.json({
+            "message":"success",
+            "data":rows
+        })
+      });
+});
+
+
+//list for currency
+app.get("/api/query/countries", (req, res, next) => {
+    let currency = req.query.currency;
+    console.log(currency)
+
+    const sql = 'select * from countries where currency=?'
+    console.log(sql)
+    const params = [currency]
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+          res.status(400).json({"error":err.message});
+          return;
+        }
+        res.json({
+            "message":"success",
+            "data":rows
+        })
+      });
+});
+
+
+
+
+
+
 
 
 // Function login user 
