@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
 // Server port
-const HTTP_PORT = 8000 
+const HTTP_PORT = 3500 
 // Start server
 
 
